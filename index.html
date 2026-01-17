@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>子役カウンター</title>
+
+<style>
+@media (orientation: landscape) {
+    body {
+      max-width: 900px;
+      margin: auto;
+    }
+  
+    h2 {
+      font-size: 28px;
+    }
+  
+    button {
+      width: 160px;
+      font-size: 22px;
+    }
+  
+    .count {
+      font-size: 26px;
+    }
+  
+    .rate {
+      font-size: 16px;
+    }
+  }
+body {
+  font-family: system-ui, sans-serif;
+  margin: 10px;
+  background: #f5f5f5;
+}
+h2 {
+  text-align: center;
+}
+.section {
+  background: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 6px 0;
+}
+button {
+  font-size: 18px;
+  padding: 12px;
+  width: 120px;
+}
+.count {
+  font-size: 20px;
+  width: 50px;
+  text-align: right;
+}
+.rate {
+  font-size: 14px;
+  color: #555;
+  width: 100px;
+  text-align: right;
+}
+input {
+  font-size: 18px;
+  width: 140px;
+}
+.reset {
+  background: #d9534f;
+  color: white;
+  width: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<h2>子役カウンター</h2>
+
+<div class="section">
+  総回転数：
+  <input type="number" id="games" min="0">
+</div>
+
+<div class="section">
+    リセット前回転数：
+    <span id="prevReset">0</span>
+  </div>
+  
+
+<div class="section" id="buttons"></div>
+
+<div class="section">
+  <button class="reset" onclick="resetAll()">全リセット</button>
+</div>
+
+<script>
+// ===== 小役定義 =====
+const items = [
+  { key: "bell",   label: "ベル" },
+  { key: "suika",  label: "スイカ" },
+  { key: "cherry", label: "チェリー" },
+  { key: "chance", label: "チャンス目" },
+  { key: "common", label: "共通役" },
+  { key: "big",    label: "BIG" },
+  { key: "reg",    label: "REG" }
+];
+
+// ===== 保存データ =====
+let data = JSON.parse(localStorage.getItem("kachikachi")) || {
+  games: 0,
+  prevResetGames:0,
+  counts: {}
+};
+
+items.forEach(i => data.counts[i.key] ??= 0);
+document.getElementById("games").value = data.games;
+
+const container = document.getElementById("buttons");
+
+// ===== UI生成 =====
+items.forEach(i => {
+  const div = document.createElement("div");
+  div.className = "row";
+  div.innerHTML = `
+    <button onclick="add('${i.key}')">${i.label}</button>
+    <span class="count" id="${i.key}">${data.counts[i.key]}</span>
+    <span class="rate" id="${i.key}Rate">-</span>
+  `;
+  container.appendChild(div);
+});
+
+// ===== 処理 =====
+function add(key) {
+  data.counts[key]++;
+  update();
+}
+
+function update() {
+  data.games = Number(document.getElementById("games").value);
+  localStorage.setItem("kachikachi", JSON.stringify(data));
+
+  items.forEach(i => {
+    const c = data.counts[i.key];
+    document.getElementById(i.key).innerText = c;
+
+    // ★ 表示を「回数 / 総回転数」に変更
+    const rate =
+      data.games > 0 && c > 0 ? `${c}/${data.games}` : "-";
+    document.getElementById(i.key + "Rate").innerText = rate;
+
+    document.getElementById("prevReset").innerText = data.prevResetGames;
+
+  });
+}
+
+function resetAll() {
+  if (!confirm("全データをリセットしますか？")) return;
+
+  // 現在の回転数を保存
+  data.prevResetGames = Number(document.getElementById("games").value);
+
+  // 総回転数を0にする（見た目＋中身）
+  data.games = 0;
+  document.getElementById("games").value = 0;
+
+  // 各カウントをリセット
+  items.forEach(i => data.counts[i.key] = 0);
+
+  update();
+}
+
+</script>
+
+
+  
+</body>
+</html>
