@@ -11,6 +11,43 @@ button {
   touch-action: manipulation;
 }
 @media (orientation: landscape) {
+  body {
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  .section {
+    padding: 8px;
+  }
+
+  h2 {
+    font-size: 26px;
+    margin: 6px 0;
+  }
+
+  /* 横画面では2列配置 */
+  #buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 22px;
+    padding: 14px;
+  }
+
+  .count {
+    font-size: 26px;
+  }
+
+  .rate {
+    font-size: 16px;
+  }
+}
+
+@media (orientation: landscape) {
     body {
       max-width: 900px;
       margin: auto;
