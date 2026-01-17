@@ -12,38 +12,46 @@ button {
 }
 @media (orientation: landscape) {
   body {
-    max-width: 1000px;
-    margin: auto;
+    margin: 0;
+    padding: 6px;
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  h2 {
+    font-size: 4.5vh;
+    margin: 4px 0;
+    text-align: center;
   }
 
   .section {
-    padding: 8px;
+    padding: 6px;
+    margin-bottom: 6px;
   }
-
-  h2 {
-    font-size: 26px;
-    margin: 6px 0;
-  }
-
-  /* 横画面では2列配置 */
+  /* ボタン全体を画面にフィット */
   #buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px 12px;
+    gap: 1.5vh 2vw;
   }
 
   button {
     width: 100%;
-    font-size: 22px;
-    padding: 14px;
+    font-size: 4vh;
+    padding: 2.5vh 0;
   }
 
   .count {
-    font-size: 26px;
+    font-size: 4.2vh;
   }
 
   .rate {
-    font-size: 16px;
+    font-size: 2.8vh;
+  }
+
+  input {
+    font-size: 3.5vh;
   }
 }
 
@@ -151,6 +159,13 @@ const items = [
   { key: "reg",    label: "REG" }
 ];
 
+function gcd(a, b) {
+  while (b !== 0) {
+    [a, b] = [b, a % b];
+  }
+  return a;
+}
+
 // ===== 保存データ =====
 let data = JSON.parse(localStorage.getItem("kachikachi")) || {
   games: 0,
@@ -190,11 +205,12 @@ function update() {
     document.getElementById(i.key).innerText = c;
 
     // ★ 表示を「回数 / 総回転数」に変更
-    const rate =
-      data.games > 0 && c > 0 ? `${c}/${data.games}` : "-";
-    document.getElementById(i.key + "Rate").innerText = rate;
-
-    document.getElementById("prevReset").innerText = data.prevResetGames;
+let rate = "-";
+if(data.games > 0 && c > 0){
+  const d = gcd(c,data.games);
+  rate = '${c / d}/${data.games / d}';
+}  
+document.getElementById(i.key + "Rate").innerText = rate;
 
   });
 }
